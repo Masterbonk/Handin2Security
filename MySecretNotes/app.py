@@ -82,7 +82,7 @@ def notes():
             noteid = request.form['noteid']
             db = connect_db()
             c = db.cursor()
-            statement = """SELECT * from scribbles where publicID = %s""",noteid
+            statement = """SELECT * from scribbles where publicID = %s""" %noteid
             c.execute(statement)
             result = c.fetchall()
             if(len(result)>0):
