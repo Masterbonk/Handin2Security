@@ -32,7 +32,7 @@ CREATE TABLE accounts (
     password TEXT NOT NULL
 );
 
-INSERT INTO accounts VALUES(null,"admin", "password");
+INSERT INTO accounts VALUES(null,"vocaloid", "K4GAM!N3R1N");
 INSERT INTO accounts VALUES(null,"bernardo", "omgMPC");
 INSERT INTO scribbles VALUES(null,2,"1993-09-23 10:10:10","hello my friend",1234567890);
 INSERT INTO scribbles VALUES(null,2,"1993-09-23 12:10:10","i want lunch pls",1234567891);
