@@ -15,10 +15,10 @@ def init_db():
     db = conn.cursor()
     db.executescript("""
 
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS notes;
+DROP TABLE IF EXISTS accounts;
+DROP TABLE IF EXISTS scribbles;
 
-CREATE TABLE notes (
+CREATE TABLE scribbles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     assocUser INTEGER NOT NULL,
     dateWritten DATETIME NOT NULL,
@@ -26,16 +26,16 @@ CREATE TABLE notes (
     publicID INTEGER NOT NULL
 );
 
-CREATE TABLE users (
+CREATE TABLE accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
     password TEXT NOT NULL
 );
 
-INSERT INTO users VALUES(null,"admin", "password");
-INSERT INTO users VALUES(null,"bernardo", "omgMPC");
-INSERT INTO notes VALUES(null,2,"1993-09-23 10:10:10","hello my friend",1234567890);
-INSERT INTO notes VALUES(null,2,"1993-09-23 12:10:10","i want lunch pls",1234567891);
+INSERT INTO accounts VALUES(null,"admin", "password");
+INSERT INTO accounts VALUES(null,"bernardo", "omgMPC");
+INSERT INTO scribbles VALUES(null,2,"1993-09-23 10:10:10","hello my friend",1234567890);
+INSERT INTO scribbles VALUES(null,2,"1993-09-23 12:10:10","i want lunch pls",1234567891);
 
 """)
 
@@ -73,7 +73,7 @@ def notes():
             note = request.form['noteinput']
             db = connect_db()
             c = db.cursor()
-            statement = """INSERT INTO notes(id,assocUser,dateWritten,note,publicID) VALUES(null,?,?,?,?);"""
+            statement = """INSERT INTO scribbles(id,assocUser,dateWritten,note,publicID) VALUES(null,?,?,?,?);"""
             print(statement)
             c.execute(statement, (session['userid'],time.strftime('%Y-%m-%d %H:%M:%S'),note,random.randrange(1000000000, 9999999999)))
             db.commit()
@@ -82,12 +82,12 @@ def notes():
             noteid = request.form['noteid']
             db = connect_db()
             c = db.cursor()
-            statement = """SELECT * from NOTES where publicID = %s""",noteid
+            statement = """SELECT * from scribbles where publicID = %s""",noteid
             c.execute(statement)
             result = c.fetchall()
             if(len(result)>0):
                 row = result[0]
-                statement = """INSERT INTO notes(id,assocUser,dateWritten,note,publicID) VALUES(null,?, ?, ? ,?);"""
+                statement = """INSERT INTO scribbles(id,assocUser,dateWritten,note,publicID) VALUES(null,?, ?, ? ,?);"""
                 c.execute(statement, (session['userid'],row[2],row[3],row[4]))
             else:
                 importerror="No such note with that ID!"
@@ -96,7 +96,7 @@ def notes():
     
     db = connect_db()
     c = db.cursor()
-    statement = "SELECT * FROM notes WHERE assocUser = ?;"  #Should not be secured
+    statement = "SELECT * FROM scribbles WHERE assocUser = ?;"  #Should not be secured
     print(statement)
     c.execute(statement, (session['userid'],))
     notes = c.fetchall()
@@ -113,7 +113,7 @@ def login():
         password = request.form['password']
         db = connect_db()
         c = db.cursor()
-        statement = "SELECT * FROM users WHERE username = ? AND password = ?;"
+        statement = "SELECT * FROM accounts WHERE username = ? AND password = ?;"
         c.execute(statement, (username, password))
         result = c.fetchall()
 
@@ -140,14 +140,14 @@ def register():
         password = request.form['password']
         db = connect_db()
         c = db.cursor()
-        statement = "SELECT * FROM users WHERE username = ? AND password = ?;"
+        statement = "SELECT * FROM accounts WHERE username = ? AND password = ?;"
         c.execute(statement, (username, password))
         if(len(c.fetchall())>0):
             errored = True
             passworderror = "That account already exists!"
 
         if(not errored):
-            statement = """INSERT INTO users(id,username,password) VALUES(null, ?, ?);"""
+            statement = """INSERT INTO accounts(id,username,password) VALUES(null, ?, ?);"""
             print(statement)
             c.execute(statement, (username, password))
             db.commit()
